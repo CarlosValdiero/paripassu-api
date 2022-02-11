@@ -6,5 +6,5 @@ Passos para rodar.
     - password: paripassu (seu usuario)
     - username: paripassu (sua senha)
     - url: jdbc:postgresql://localhost/bd_paripassu
-  -  execute Application.java
+  -  Execute Application.java
   
