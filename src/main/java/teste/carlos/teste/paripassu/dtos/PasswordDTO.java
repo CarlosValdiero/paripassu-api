@@ -11,11 +11,17 @@ public class PasswordDTO {
 
 	private String uuidSequence;
 	private String value;
+	
+	public PasswordDTO() {
+		this(null);
+	}
 
 	public PasswordDTO(CurrentPassword currentPassword) {
 		if (Objects.nonNull(currentPassword) && isValidValue(currentPassword.getValue())) {
 			this.uuidSequence = currentPassword.getUuidSequence().toString();
-			setValue(currentPassword.getPasswordType(), currentPassword.getValue());
+			this.value = PasswordUtil.formatPassword(currentPassword.getPasswordType(), currentPassword.getValue());
+		} else {
+			this.value = "_____";
 		}
 	}
 	
