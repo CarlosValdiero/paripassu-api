@@ -2,6 +2,7 @@ package teste.carlos.teste.paripassu.services.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,26 +15,33 @@ import teste.carlos.teste.paripassu.models.PasswordSequence;
 import teste.carlos.teste.paripassu.providers.CurrentPasswordProvider;
 import teste.carlos.teste.paripassu.providers.PasswordSequenceProvider;
 import teste.carlos.teste.paripassu.services.PasswordSequenceService;
+import teste.carlos.teste.paripassu.services.WebSocketService;
 
 @Service
 public class PasswordSequenceServiceImpl implements PasswordSequenceService {
 
 	private PasswordSequenceProvider passwordSequenceProvider;
 	private CurrentPasswordProvider currentPasswordProvider;
+	private WebSocketService webSocketService;
 
 	@Autowired
 	public PasswordSequenceServiceImpl(PasswordSequenceProvider passwordSequenceProvider,
-			CurrentPasswordProvider currentPasswordProvider) {
+			CurrentPasswordProvider currentPasswordProvider, WebSocketService webSocketService) {
 		this.passwordSequenceProvider = passwordSequenceProvider;
 		this.currentPasswordProvider = currentPasswordProvider;
+		this.webSocketService = webSocketService;
 	}
 
 	@Override
 	public PasswordDTO getCurrentPassword() {
-		CurrentPassword currentPassword = currentPasswordProvider.findAll().stream().findFirst()
-				.orElse(new CurrentPassword());
-
-		return new PasswordDTO(currentPassword);
+		Optional<CurrentPassword> currentPassword = currentPasswordProvider
+				.findAll().stream().findFirst();
+		
+		if(currentPassword.isPresent()) {
+			return new PasswordDTO(currentPassword.get());
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -53,19 +61,24 @@ public class PasswordSequenceServiceImpl implements PasswordSequenceService {
 		List<PasswordSequence> passwordSequences = passwordSequenceProvider.findByValueMoreThanCurrentValue();
 		currentPasswordProvider.deleteAll();
 
-		if (passwordSequences.isEmpty()) {
-			return;
+		CurrentPassword currentPassword;
+		if ( passwordSequences.size() > 0) {
+			
+			PasswordSequence passwordSequence = passwordSequences.stream()
+					.filter(sequence -> sequence.getPasswordType().equals(PasswordType.P)).findFirst()
+					.orElse(passwordSequences.get(0));
+	
+			passwordSequence.nextCurrentPassword();
+			currentPassword = new CurrentPassword(passwordSequence);
+	
+			passwordSequenceProvider.save(passwordSequence);
+			currentPasswordProvider.save(currentPassword);
+		
+		} else {
+			currentPassword = new CurrentPassword();
 		}
-
-		PasswordSequence passwordSequence = passwordSequences.stream()
-				.filter(sequence -> sequence.getPasswordType().equals(PasswordType.P)).findFirst()
-				.orElse(passwordSequences.get(0));
-
-		passwordSequence.nextCurrentPassword();
-		CurrentPassword currentPassword = new CurrentPassword(passwordSequence);
-
-		passwordSequenceProvider.save(passwordSequence);
-		currentPasswordProvider.save(currentPassword);
+		
+		webSocketService.sendMessage("/password/current", new PasswordDTO(currentPassword));
 	}
 
 	@Override
@@ -77,5 +90,7 @@ public class PasswordSequenceServiceImpl implements PasswordSequenceService {
 		List<PasswordSequence> passwordSequences = Arrays.asList(new PasswordSequence(PasswordType.N),
 				new PasswordSequence(PasswordType.P));
 		passwordSequenceProvider.saveAll(passwordSequences);
+		
+		webSocketService.sendMessage("/password/current", new PasswordDTO());
 	}
 }
