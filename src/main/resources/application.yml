@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: paripassu
+    url: jdbc:postgresql://localhost/bd_paripassu
+    username: paripassu
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    show-sql: true
+  
+application-web:
+  url: ${WEB_URL:http://localhost:4200}
