@@ -18,8 +18,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/websockets")
-	       .setAllowedOrigins(webUrl)
-	       .withSockJS();
+	       .setAllowedOrigins(webUrl);
 	}
 
 	@Override
@@ -27,4 +26,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	    config.enableSimpleBroker("/password");
 	    config.setApplicationDestinationPrefixes("/app");
 	}
+	
+	
 }
