@@ -41,7 +41,7 @@ public class PasswordSequenceServiceImpl implements PasswordSequenceService {
 			return new PasswordDTO(currentPassword.get());
 		}
 		
-		return null;
+		return new PasswordDTO();
 	}
 	
 	@Override
