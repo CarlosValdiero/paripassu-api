@@ -18,7 +18,7 @@ public class CurrentPassword {
 	public CurrentPassword() {}
 
 	public CurrentPassword(PasswordSequence passwordSequence) {
-		this.uuidSequence = passwordSequence.getUuid();
+		this.uuidSequence = passwordSequence.getSequenceCode();
 		this.passwordType = passwordSequence.getPasswordType();
 		this.value = passwordSequence.getCurrentValue();
 	}

@@ -37,6 +37,8 @@ public class PasswordDTO {
 	private void setValue( PasswordType passwordType, Integer value) {
 		if(isValidValue(value)) {
 			this.value = PasswordUtil.formatPassword(passwordType, value);			
+		} else {
+			this.value = "_____";
 		}
 	}
 
