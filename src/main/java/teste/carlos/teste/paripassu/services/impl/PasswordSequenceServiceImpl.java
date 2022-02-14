@@ -3,6 +3,7 @@ package teste.carlos.teste.paripassu.services.impl;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,13 +47,13 @@ public class PasswordSequenceServiceImpl implements PasswordSequenceService {
 	
 	@Override
 	@Transactional
-	public PasswordDTO getNewPassword(PasswordType passwordType) {
+	public PasswordDTO getNewPassword(PasswordType passwordType) throws Exception {
 		PasswordSequence passwordSequence = passwordSequenceProvider.findByPasswordType(passwordType)
-				.orElse(new PasswordSequence(passwordType));
+				.orElseThrow(() -> new Exception("Erro ao buscar nova senha. Entre em contato com atendimento."));
 		
 		passwordSequence.nextPassword();
 		passwordSequenceProvider.save(passwordSequence);
-		return new PasswordDTO(passwordSequence.getUuid(), passwordSequence.getPasswordType(), passwordSequence.getValue());		
+		return new PasswordDTO(passwordSequence.getSequenceCode(), passwordSequence.getPasswordType(), passwordSequence.getValue());		
 	}
 
 	@Override
@@ -87,8 +88,10 @@ public class PasswordSequenceServiceImpl implements PasswordSequenceService {
 		passwordSequenceProvider.deleteAll();
 		currentPasswordProvider.deleteAll();
 
-		List<PasswordSequence> passwordSequences = Arrays.asList(new PasswordSequence(PasswordType.N),
-				new PasswordSequence(PasswordType.P));
+		UUID sequenceCode = UUID.randomUUID();
+		List<PasswordSequence> passwordSequences = Arrays.asList(new PasswordSequence(PasswordType.N, sequenceCode),
+				new PasswordSequence(PasswordType.P, sequenceCode));
+		
 		passwordSequenceProvider.saveAll(passwordSequences);
 		
 		webSocketService.sendMessage("/password/current", new PasswordDTO());

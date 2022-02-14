@@ -1,5 +1,6 @@
 package teste.carlos.teste.paripassu.dtos;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -14,20 +15,23 @@ import teste.carlos.teste.paripassu.models.PasswordSequence;
 
 
 public class PasswordDTOTest {
+	
+	private final String DEFAULT_VALUE = "_____";
 
 	@Test
-	@DisplayName("Expected new PasswordDTO with null values when Current Password is null")
+	@DisplayName("Expected new PasswordDTO with default value when Current Password not exists.")
 	public void ExpectedNewPasswordDTOWithNullValuesWhenCurrentPasswordIsNull() {
-		PasswordDTO passwordDTO = new PasswordDTO(null);
+		PasswordDTO passwordDTO = new PasswordDTO();
 		
 		assertNull(passwordDTO.getUuidSequence());
-		assertNull(passwordDTO.getValue());
+		assertEquals(DEFAULT_VALUE, passwordDTO.getValue());
 	}
 	
 	@Test
 	@DisplayName("Expected new PasswordDTO when Current Password is not null and value more than 0")
 	public void ExpectedNewPasswordDTOWhenCurrentPasswordIsNotNullAndValueMoreThan0() {
-		PasswordSequence passwordSequence = new PasswordSequence(PasswordType.P);
+		UUID sequence = UUID.randomUUID();
+		PasswordSequence passwordSequence = new PasswordSequence(PasswordType.P, sequence);
 		passwordSequence.nextPassword();
 		passwordSequence.nextCurrentPassword();
 		CurrentPassword currentPassword = new CurrentPassword(passwordSequence);
@@ -40,12 +44,13 @@ public class PasswordDTOTest {
 	@Test
 	@DisplayName("Expected new PasswordDTO when Current Password is not null and value less than 1")
 	public void ExpectedNewPasswordDTOWhenCurrentPasswordIsNotNullAndValueLessThan1() {
-		PasswordSequence passwordSequence = new PasswordSequence(PasswordType.P);
+		UUID sequence = UUID.randomUUID();
+		PasswordSequence passwordSequence = new PasswordSequence(PasswordType.P, sequence);
 		CurrentPassword currentPassword = new CurrentPassword(passwordSequence);
 		PasswordDTO passwordDTO = new PasswordDTO(currentPassword);
 		
 		assertNull(passwordDTO.getUuidSequence());
-		assertNull(passwordDTO.getValue());
+		assertEquals(DEFAULT_VALUE,passwordDTO.getValue());
 	}
 	
 	@Test
@@ -63,6 +68,6 @@ public class PasswordDTOTest {
 		PasswordDTO passwordDTO = new PasswordDTO(UUID.randomUUID(), PasswordType.P, 0);
 		
 		assertNotNull(passwordDTO.getUuidSequence());
-		assertNull(passwordDTO.getValue());
+		assertEquals(DEFAULT_VALUE,passwordDTO.getValue());
 	}
 }

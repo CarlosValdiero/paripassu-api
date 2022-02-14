@@ -12,6 +12,7 @@ public class PasswordSequence {
 	
 	@Id
 	private UUID uuid;
+	private UUID sequenceCode;
 	private PasswordType passwordType;
 	private Integer value;
 	private Integer currentValue;
@@ -20,8 +21,9 @@ public class PasswordSequence {
 	
 	public PasswordSequence() {}
 	
-	public PasswordSequence( PasswordType passwordType) {
+	public PasswordSequence( PasswordType passwordType, UUID sequenceCode) {
 		this.uuid = UUID.randomUUID();
+		this.sequenceCode = sequenceCode;
 		this.passwordType = passwordType;
 		this.value = INITIAL_VALUE;
 		this.currentValue = INITIAL_VALUE;
@@ -61,4 +63,7 @@ public class PasswordSequence {
 		return currentValue;
 	}
 
+	public UUID getSequenceCode() {
+		return sequenceCode;
+	}
 }

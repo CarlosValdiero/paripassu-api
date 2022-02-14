@@ -7,7 +7,7 @@ public interface PasswordSequenceService {
 
 	PasswordDTO getCurrentPassword();
 
-	PasswordDTO getNewPassword(PasswordType passwordType);
+	PasswordDTO getNewPassword(PasswordType passwordType) throws Exception;
 
 	void resetPasswords();
 
